@@ -59,6 +59,7 @@ arm7/$(TARGET).elf:
 	
 #---------------------------------------------------------------------------------
 arm9/$(TARGET).elf	:	arm9/data/load.bin arm9/source/version.h
+	xxd -i cheats.xml > arm9/source/cheats.xml.c
 	$(MAKE) -C arm9
 
 #---------------------------------------------------------------------------------

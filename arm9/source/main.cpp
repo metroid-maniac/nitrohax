@@ -24,6 +24,7 @@
 #include <list>
 
 #include "cheat.h"
+#include "cheats.xml.h"
 #include "ui.h"
 #include "nds_card.h"
 #include "cheat_engine.h"
@@ -31,7 +32,6 @@
 #include "version.h"
 
 const char TITLE_STRING[] = "Nitro Hax " VERSION_STRING "\nWritten by Chishm";
-const char* defaultFiles[] = {"cheats.xml", "/DS/NitroHax/cheats.xml", "/NitroHax/cheats.xml", "/data/NitroHax/cheats.xml", "/cheats.xml"};
 
 
 static inline void ensure (bool condition, const char* errorMsg) {
@@ -65,19 +65,7 @@ int main(int argc, const char* argv[])
 	while(1);
 #endif
 
-	ensure (fatInitDefault(), "FAT init failed");
-
-	// Read cheat file
-	for (u32 i = 0; i < sizeof(defaultFiles)/sizeof(const char*); i++) {
-		cheatFile = fopen (defaultFiles[i], "rb");
-		if (NULL != cheatFile) break;
-	}
-	if (NULL == cheatFile) {
-		filename = ui.fileBrowser (".xml");
-		ensure (filename.size() > 0, "No file specified");
-		cheatFile = fopen (filename.c_str(), "rb");
-		ensure (cheatFile != NULL, "Couldn't load cheats");
-	}
+	cheatFile = fmemopen(cheats_xml, cheats_xml_len, "r");
 
 	ui.showMessage (UserInterface::TEXT_TITLE, TITLE_STRING);
 	ui.showMessage ("Loading codes");
@@ -93,12 +81,6 @@ int main(int argc, const char* argv[])
 	ui.showMessage (UserInterface::TEXT_TITLE, TITLE_STRING);
 
 	sysSetCardOwner (BUS_OWNER_ARM9);
-
-	ui.showMessage ("Loaded codes\nYou can remove your flash card\nRemove DS Card");
-	do {
-		swiWaitForVBlank();
-		getHeader (ndsHeader);
-	} while (ndsHeader[0] != 0xffffffff);
 
 	ui.showMessage ("Insert Game");
 	do {
